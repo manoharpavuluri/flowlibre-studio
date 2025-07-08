@@ -1,69 +1,115 @@
-# React + TypeScript + Vite
+# FlowLibre Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React/TypeScript dashboard for managing AI agents with interactive design capabilities.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **AI Agent Management**: Dashboard for File Workflow, Image Workflow, Batch Workflow, and Design Agent
+- **Interactive Design Agent**: Drag-and-drop ETL workflow builder with visual connections
+- **Real-time Metrics**: Live dashboard tiles with agent performance metrics
+- **Modern UI**: Built with React, TypeScript, and Tailwind CSS
+- **Responsive Design**: Works seamlessly across desktop and mobile devices
 
-## Expanding the ESLint configuration
+## 🛠️ Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Frontend**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **State Management**: React Hooks
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 📦 Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/manoharpavuluri/flowlibre-studio.git
+   cd flowlibre-studio
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser** and navigate to `http://localhost:5173`
+
+## 🎯 Usage
+
+### Dashboard Overview
+- View all AI agents in a clean, organized dashboard
+- Monitor agent status (Active, In-Development, Inactive)
+- Access detailed metrics for each agent type
+
+### Design Agent Workflow Builder
+1. **Add Components**: Drag components from the sidebar to the canvas
+2. **Connect Components**: Click and drag from arrow icons to link icons
+3. **Build ETL Workflows**: Create data processing pipelines visually
+4. **Save Workflows**: Save your workflow configurations
+
+### Agent Types
+- **File Workflow**: Process and analyze file data
+- **Image Workflow**: Handle image processing tasks
+- **Batch Workflow**: Manage batch processing operations
+- **Design Agent**: Visual ETL workflow builder
+
+## 🏗️ Project Structure
+
+```
+src/
+├── components/
+│   ├── dashboards/          # Dashboard components
+│   │   ├── FileWorkflowDashboard.tsx
+│   │   ├── ImageWorkflowDashboard.tsx
+│   │   ├── BatchWorkflowDashboard.tsx
+│   │   ├── DesignAgentDashboard.tsx
+│   │   ├── FileWorkflowDesignAgent.tsx
+│   │   └── ...
+│   ├── shared/              # Shared components and types
+│   └── ...
+├── services/                # Data services
+│   ├── fileWorkflowData.ts
+│   ├── imageWorkflowData.ts
+│   └── batchWorkflowData.ts
+└── ...
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 🔧 Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Available Scripts
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+### Adding New Features
+
+1. **New Agent Type**: Add dashboard component in `src/components/dashboards/`
+2. **New Data Service**: Create service file in `src/services/`
+3. **New Components**: Add to `src/components/shared/`
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 👨‍💻 Author
+
+**Manohar Pavuluri**
+- GitHub: [@manoharpavuluri](https://github.com/manoharpavuluri)
+
+---
+
+Built with ❤️ using React, TypeScript, and Vite
