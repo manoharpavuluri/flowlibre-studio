@@ -100,7 +100,13 @@ function App() {
     );
   }
 
-  return <HomePage agents={agents} onAgentSelect={handleAgentSelect} />;
+  return (
+    <>
+      {/* Hidden transparent image for drag preview suppression */}
+      <img id="drag-transparent" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=" style={{ position: 'absolute', top: -1000, left: -1000, width: 1, height: 1, pointerEvents: 'none' }} alt="" />
+      <HomePage agents={agents} onAgentSelect={handleAgentSelect} />
+    </>
+  );
 }
 
 export default App;
