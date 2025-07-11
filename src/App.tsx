@@ -13,12 +13,12 @@ function App() {
   const agents: Agent[] = [
     {
       id: 1,
-      name: 'Invoice Parser Pro',
+      name: 'Invoice Reader Pro',
       type: 'File Workflow',
       icon: FileText,
       status: 'in-development',
       lastModified: '2025-01-15T10:30:00Z',
-      description: 'Advanced invoice parsing and data extraction'
+      description: 'Advanced invoice file reading and data extraction'
     },
     {
       id: 2,

@@ -1,66 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { XCircle } from 'lucide-react';
 import type { Agent } from '../shared/types';
+import { getFileProcessingErrors } from '../../services/fileProcessingErrors';
 
 interface FileWorkflowDashboardParsingErrorProps {
   agent: Agent;
   onBack: () => void;
+  dateFilter: string;
+  customDateRange: { start: string; end: string };
 }
 
-const FileWorkflowDashboardParsingError: React.FC<FileWorkflowDashboardParsingErrorProps> = ({ agent, onBack }) => {
-  // This data would typically come from an API or props
-  const parsingErrors = [
-    { 
-      file: 'corrupted_invoice_001.pdf', 
-      error: 'Azure Document Intelligence failed to extract text',
-      details: 'File appears to be corrupted or in unsupported format',
-      confidence: 0,
-      service: 'Azure Document Intelligence',
-      time: '2025-01-15 14:05',
-      fileSize: '2.3 MB',
-      attemptCount: 3
-    },
-    { 
-      file: 'scanned_receipt.pdf', 
-      error: 'OCR confidence below threshold',
-      details: 'Text extraction confidence score: 65% (minimum required: 80%)',
-      confidence: 65,
-      service: 'Azure Document Intelligence',
-      time: '2025-01-14 16:23',
-      fileSize: '1.8 MB',
-      attemptCount: 1
-    },
-    { 
-      file: 'foreign_language.pdf', 
-      error: 'Unsupported language detected',
-      details: 'Document contains text in Spanish, but only English is supported',
-      confidence: 0,
-      service: 'Azure Document Intelligence',
-      time: '2025-01-14 11:45',
-      fileSize: '945 KB',
-      attemptCount: 1
-    },
-    { 
-      file: 'blurry_invoice.pdf', 
-      error: 'Image quality too low for OCR',
-      details: 'Image resolution insufficient for reliable text extraction',
-      confidence: 45,
-      service: 'Azure Document Intelligence',
-      time: '2025-01-14 10:15',
-      fileSize: '3.2 MB',
-      attemptCount: 2
-    },
-    { 
-      file: 'password_protected.pdf', 
-      error: 'Password-protected document',
-      details: 'Document is encrypted and requires password for access',
-      confidence: 0,
-      service: 'Azure Document Intelligence',
-      time: '2025-01-14 09:30',
-      fileSize: '1.5 MB',
-      attemptCount: 1
-    }
-  ];
+const FileWorkflowDashboardParsingError: React.FC<FileWorkflowDashboardParsingErrorProps> = ({ agent, onBack, dateFilter, customDateRange }) => {
+  const [parsingErrors, setParsingErrors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getErrors = () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('🔄 Getting file reading errors for dateFilter:', dateFilter);
+        
+        // Direct feature logic integration - no API calls
+        const errors = getFileProcessingErrors('parsing', dateFilter as any);
+        setParsingErrors(errors);
+      } catch (err) {
+        console.error('Failed to get errors:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load errors');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getErrors();
+  }, [agent.id, dateFilter, customDateRange]);
+
+  if (loading) {
+    return <div className="p-8 text-center text-gray-500">Loading file reading errors...</div>;
+  }
+  if (error) {
+    return <div className="p-8 text-center text-red-500">{error}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,7 +64,7 @@ const FileWorkflowDashboardParsingError: React.FC<FileWorkflowDashboardParsingEr
                   <XCircle className="w-5 h-5 text-red-600" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-semibold text-gray-900">Parsing Error Details</h1>
+                  <h1 className="text-xl font-semibold text-gray-900">File Reading Error Details</h1>
                   <p className="text-sm text-gray-500">{agent.name} • Azure Document Intelligence</p>
                 </div>
               </div>
@@ -98,9 +79,9 @@ const FileWorkflowDashboardParsingError: React.FC<FileWorkflowDashboardParsingEr
           <div className="p-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">Azure Document Intelligence Parsing Errors</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Azure Document Intelligence File Reading Errors</h3>
                 <div className="text-sm text-gray-500">
-                  {parsingErrors.length} files with parsing errors
+                  {parsingErrors.length} files with file reading errors
                 </div>
               </div>
               

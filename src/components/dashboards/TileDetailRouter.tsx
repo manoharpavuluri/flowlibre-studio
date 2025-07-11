@@ -9,16 +9,20 @@ interface TileDetailRouterProps {
   agent: Agent;
   tileType: string;
   onBackToDashboard: () => void;
+  dateFilter: string;
+  customDateRange: { start: string; end: string };
 }
 
 const TileDetailRouter: React.FC<TileDetailRouterProps> = ({ 
   agent, 
   tileType, 
-  onBackToDashboard 
+  onBackToDashboard,
+  dateFilter,
+  customDateRange
 }) => {
   switch (tileType) {
     case 'parsing-errors':
-      return <FileWorkflowDashboardParsingError agent={agent} onBack={onBackToDashboard} />;
+      return <FileWorkflowDashboardParsingError agent={agent} onBack={onBackToDashboard} dateFilter={dateFilter} customDateRange={customDateRange} />;
     case 'matching-errors':
       return <FileWorkflowDashboardMatchingError agent={agent} onBack={onBackToDashboard} />;
     case 'total-files':

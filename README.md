@@ -13,6 +13,8 @@ A modern React/TypeScript dashboard for managing AI agents with interactive, nod
 - **Intuitive Canvas**: Drag, zoom, and pan the workflow canvas; smooth node movement and connection creation
 - **Visual Ports**: Chain link and arrow icons for input/output ports, with clear connection logic
 - **Real-time Metrics**: Live dashboard tiles with agent performance metrics
+- **File Ingestion**: Direct file upload and processing with drag-and-drop support
+- **Document Processing**: Automatic text extraction, key-value pair detection, and table parsing
 - **Modern UI**: Built with React, TypeScript, and Tailwind CSS
 - **Responsive Design**: Works seamlessly across desktop and mobile devices
 
@@ -23,6 +25,12 @@ A modern React/TypeScript dashboard for managing AI agents with interactive, nod
 - **Styling**: Tailwind CSS
 - **Icons**: Lucide React
 - **State Management**: React Hooks
+- **Feature Logic**: Direct integration between UI and business logic
+- **Data Services**: Direct data services with no API layer complexity
+- **Backend**: Optional Express.js/FastAPI for production deployment
+- **Database**: Optional SQLite/PostgreSQL/MongoDB for production
+- **Authentication**: Optional JWT with bcrypt for production
+- **File Processing**: Direct file processing logic
 
 ## 📦 Installation
 
@@ -49,7 +57,17 @@ A modern React/TypeScript dashboard for managing AI agents with interactive, nod
 ### Dashboard Overview
 - View all AI agents in a clean, organized dashboard
 - Monitor agent status (Active, In-Development, Inactive)
+- Real-time metrics with direct feature logic integration
+- Direct data services with no API complexity
 - Access detailed metrics for each agent type
+- Upload and process files directly in the dashboard
+
+### File Ingestion
+- **Drag & Drop**: Simply drag files onto the upload area
+- **Multiple Formats**: Supports PDF, CSV, Excel, Word, and text files
+- **Real-time Processing**: See processing progress and results instantly
+- **Extraction Results**: View extracted text, key-value pairs, and tables
+- **Confidence Scoring**: See processing confidence levels for each document
 
 ### Design Agent Workflow Builder
 1. **Add Components**: Drag components from the sidebar to the canvas, or use the modal-driven type selector
@@ -101,12 +119,42 @@ src/
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 
+### Direct Integration Features
+
+- **Feature Logic**: Direct integration between UI and business logic
+- **Data Services**: Simple, direct data services with no API complexity
+- **Error Handling**: Built-in error handling for data operations
+- **Loading States**: Automatic loading state management
+- **Real-time Updates**: Direct state updates for live data
+
+### Optional Backend Integration
+
+For production deployment, you can optionally add a backend:
+
+1. **Set up the backend server** (see `backend-setup.md` for detailed instructions)
+2. **Configure environment variables**:
+   ```bash
+   # Create .env file in frontend directory
+   VITE_API_BASE_URL=http://localhost:3001/api
+   ```
+3. **Start both frontend and backend**:
+   ```bash
+   # Terminal 1 - Frontend
+   npm run dev
+   
+   # Terminal 2 - Backend
+   cd ../flowlibre-backend
+   npm run dev
+   ```
+
 ### Adding New Features
 
 1. **New Node Type**: Add a new component in `src/components/nodes/` and register it in the workflow logic
 2. **New Agent Type**: Add dashboard component in `src/components/dashboards/`
-3. **New Data Service**: Create service file in `src/services/`
+3. **New Feature Logic**: Create service file in `src/services/` with direct integration
 4. **New Shared Components**: Add to `src/components/shared/`
+5. **New Data Service**: Add direct data service in `src/services/` (no API layer)
+6. **Optional Backend**: Add route handler in backend server for production (see backend-setup.md)
 
 ## 🤝 Contributing
 

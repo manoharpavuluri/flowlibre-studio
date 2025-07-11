@@ -1,11 +1,22 @@
-import React, { useState } from 'react';
-import { FileText, CheckCircle, Settings, Eye, Calendar, ChevronDown, Database, AlertTriangle, BarChart3 } from 'lucide-react';
-import type { Agent, DateFilter, DateRange } from '../../components/shared/types';
+import React, { useState, useCallback, useEffect } from 'react';
+import { 
+  Calendar, 
+  ChevronDown, 
+  Eye, 
+  FileText, 
+  CheckCircle, 
+  Database, 
+  AlertTriangle, 
+  BarChart3,
+  Upload
+} from 'lucide-react';
+import type { Agent, DateFilter, DateRange } from '../shared/types';
 import { getFileWorkflowData } from '../../services/fileWorkflowData';
+import FileUpload from '../FileUpload';
 
 interface FileWorkflowDashboardProps {
   agent: Agent;
-  onTileClick: (tileType: string) => void;
+  onTileClick: (tileType: string, dateFilter: DateFilter, customDateRange: DateRange) => void;
   onBackToHome: () => void;
 }
 
@@ -18,7 +29,30 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [customDateRange, setCustomDateRange] = useState<DateRange>({ start: '', end: '' });
 
-  const currentData = getFileWorkflowData(dateFilter);
+  // Use the smart data service with API integration
+  const [currentData, setCurrentData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = () => {
+      try {
+        setLoading(true);
+        setError(null);
+        console.log('🔄 Getting file workflow data for dateFilter:', dateFilter);
+        // Direct integration - no API calls
+        const data = getFileWorkflowData(dateFilter);
+        setCurrentData(data);
+      } catch (err) {
+        console.error('Failed to get data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [agent.id, dateFilter]);
 
   const formatDateFilter = (filter: string): string => {
     switch (filter) {
@@ -54,6 +88,55 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
     setShowDatePicker(false);
   };
 
+  // Show loading state
+  if (loading && !currentData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Loading Dashboard</h3>
+              <p className="text-gray-600">Fetching latest metrics...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error && !currentData) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="p-4 bg-red-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                <AlertTriangle className="w-8 h-8 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Data</h3>
+              <p className="text-gray-600 mb-4">{error}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Use fallback data if API fails
+  const metrics = (currentData?.data || currentData) || {
+    totalFilesProcessed: 0,
+    successRateParsing: 0,
+    successRateMatching: 0,
+    totalParsingErrors: 0,
+    totalMatchingErrors: 0,
+  };
+
+  // Debug: Log the data we're receiving
+  console.log('📊 Current workflow data:', currentData);
+  console.log('📊 Processed metrics:', metrics);
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -65,61 +148,58 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
                 onClick={onBackToHome}
                 className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors"
               >
-                ← Back to Agents
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                <span>Back to Home</span>
               </button>
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-blue-100 rounded-lg">
-                  <agent.icon className="w-5 h-5 text-blue-600" />
+                  <FileText className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <h1 className="text-xl font-semibold text-gray-900">{agent.name}</h1>
-                  <p className="text-sm text-gray-500">{agent.type}</p>
+                  <p className="text-sm text-gray-500">File Workflow • {agent.status}</p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <div className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium border ${
-                agent.status === 'active' 
-                  ? 'bg-green-100 text-green-800 border-green-200' 
-                  : 'bg-gray-100 text-gray-800 border-gray-200'
-              }`}>
-                <CheckCircle className="w-3 h-3" />
-                <span>{agent.status === 'active' ? 'Live' : agent.status}</span>
-              </div>
-              <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-                <Settings className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-                      <nav className="flex space-x-8">
+            
+            {/* Navigation Tabs */}
+            <nav className="flex space-x-8">
               <button className="py-4 px-1 border-b-2 font-medium text-sm border-blue-500 text-blue-600">
                 Dashboard
               </button>
               <button className="py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700">
-                LLM Q&A
-              </button>
-              <button 
-                onClick={() => onTileClick('design-agent')}
-                className="py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 cursor-pointer"
-              >
                 Design Agent
               </button>
               <button className="py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700">
                 Run History
               </button>
             </nav>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
+          {/* File Upload Section */}
+          {agent.status === 'active' && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <Upload className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-semibold text-gray-900">File Ingestion</h3>
+              </div>
+              <FileUpload 
+                agentId={agent.id} 
+                onFileProcessed={(result) => {
+                  console.log('📁 File processed:', result);
+                  // You can add logic here to update metrics or refresh data
+                }}
+              />
+            </div>
+          )}
+
           {/* Date Filter */}
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-gray-900">File Processing Overview</h2>
@@ -198,7 +278,7 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
             <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
               {/* Total Files Processed */}
               <div 
-                onClick={() => onTileClick('total-files')}
+                onClick={() => onTileClick('total-files', dateFilter, customDateRange)}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-lg hover:scale-105 hover:border-blue-300 transition-all duration-200"
               >
                 <div className="flex items-center justify-between mb-4">
@@ -209,14 +289,14 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Files Processed</p>
-                  <p className="text-3xl font-bold text-gray-900">{currentData.totalFilesProcessed.toLocaleString()}</p>
+                  <p className="text-3xl font-bold text-gray-900">{metrics.totalFilesProcessed.toLocaleString()}</p>
                   <p className="text-sm text-blue-600 mt-1">Click to view details</p>
                 </div>
               </div>
 
-              {/* Success Rate (Parsing) */}
+              {/* Success Rate (File Reading) */}
               <div 
-                onClick={() => onTileClick('parsing-success')}
+                onClick={() => onTileClick('parsing-success', dateFilter, customDateRange)}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-lg hover:scale-105 hover:border-blue-300 transition-all duration-200"
               >
                 <div className="flex items-center justify-between mb-4">
@@ -226,15 +306,15 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
                   <Eye className="w-5 h-5 text-gray-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Success Rate (Parsing)</p>
-                  <p className="text-3xl font-bold text-gray-900">{currentData.successRateParsing}%</p>
+                  <p className="text-sm font-medium text-gray-600">Success Rate (File Reading)</p>
+                  <p className="text-3xl font-bold text-gray-900">{metrics.successRateParsing}%</p>
                   <p className="text-sm text-green-600 mt-1">Click to view by field</p>
                 </div>
               </div>
 
               {/* Success Rate (Matching) */}
               <div 
-                onClick={() => onTileClick('matching-success')}
+                onClick={() => onTileClick('matching-success', dateFilter, customDateRange)}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-lg hover:scale-105 hover:border-blue-300 transition-all duration-200"
               >
                 <div className="flex items-center justify-between mb-4">
@@ -245,14 +325,14 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Success Rate (Matching)</p>
-                  <p className="text-3xl font-bold text-gray-900">{currentData.successRateMatching}%</p>
+                  <p className="text-3xl font-bold text-gray-900">{metrics.successRateMatching}%</p>
                   <p className="text-sm text-purple-600 mt-1">Click to view by vendor</p>
                 </div>
               </div>
 
-              {/* Total Parsing Errors */}
+              {/* Total File Reading Errors */}
               <div 
-                onClick={() => onTileClick('parsing-errors')}
+                onClick={() => onTileClick('parsing-errors', dateFilter, customDateRange)}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-lg hover:scale-105 hover:border-blue-300 transition-all duration-200"
               >
                 <div className="flex items-center justify-between mb-4">
@@ -262,15 +342,15 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
                   <Eye className="w-5 h-5 text-gray-400" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Parsing Errors</p>
-                  <p className="text-3xl font-bold text-gray-900">{currentData.totalParsingErrors}</p>
+                  <p className="text-sm font-medium text-gray-600">Total File Reading Errors</p>
+                  <p className="text-3xl font-bold text-gray-900">{metrics.totalParsingErrors}</p>
                   <p className="text-sm text-red-600 mt-1">Click to view error details</p>
                 </div>
               </div>
 
               {/* Total Matching Errors */}
               <div 
-                onClick={() => onTileClick('matching-errors')}
+                onClick={() => onTileClick('matching-errors', dateFilter, customDateRange)}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-lg hover:scale-105 hover:border-blue-300 transition-all duration-200"
               >
                 <div className="flex items-center justify-between mb-4">
@@ -281,7 +361,7 @@ const FileWorkflowDashboard: React.FC<FileWorkflowDashboardProps> = ({
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Matching Errors</p>
-                  <p className="text-3xl font-bold text-gray-900">{currentData.totalMatchingErrors}</p>
+                  <p className="text-3xl font-bold text-gray-900">{metrics.totalMatchingErrors}</p>
                   <p className="text-sm text-orange-600 mt-1">Click to view error details</p>
                 </div>
               </div>

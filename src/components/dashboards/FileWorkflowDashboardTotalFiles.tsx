@@ -28,6 +28,15 @@ const FileWorkflowDashboardTotalFiles: React.FC<FileWorkflowDashboardTotalFilesP
     }
   };
 
+  const getStatusDisplayName = (status: string): string => {
+    switch (status) {
+      case 'success': return 'Success';
+      case 'parsing_error': return 'File Reading Error';
+      case 'matching_error': return 'Matching Error';
+      default: return status.replace('_', ' ');
+    }
+  };
+
   const successCount = processedFiles.filter(file => file.status === 'success').length;
   const errorCount = processedFiles.length - successCount;
 
@@ -115,7 +124,7 @@ const FileWorkflowDashboardTotalFiles: React.FC<FileWorkflowDashboardTotalFilesP
                         <td className="py-3 px-4 text-sm text-gray-900">{file.name}</td>
                         <td className="py-3 px-4">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(file.status)}`}>
-                            {file.status.replace('_', ' ')}
+                            {getStatusDisplayName(file.status)}
                           </span>
                         </td>
                         <td className="py-3 px-4 text-sm text-gray-600">{file.processedAt}</td>
